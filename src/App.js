@@ -6,24 +6,44 @@ import './App.scss'
 import { CiWarning } from "react-icons/ci";
 
 const baseURL = "http://localhost:3000/api/get";
+
 function MyComponent() {
   const [data, setData] = useState([]);
   const [isChecked, setIsChecked] = useState(true);
+  const [waterlevel,setWaterlevel]= useState(0);
+
+  
   React.useEffect(() => {
-    axios.get(baseURL).then((response) => {
-      setData(response.data)
-      response.data.map((e) => {
-        if (e._id === "654de9edd47767a2a0b3c4cd") {
-          setIsChecked(e.isMotorOn)
-        }
-      })
+     
 
+    const fetchData = async () => {
+      try {
+        // Your asynchronous logic goes here
+        axios.get(baseURL).then((response) => {
+          setData(response.data)
+          response.data.map((e) => {
+            if (e._id === "654de9edd47767a2a0b3c4cd") {
+              setIsChecked(e.isMotorOn)
+              setWaterlevel(e.waterLevel)
+            }
+          })
+    
+    
+        })
+        console.log('Data:', data);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
 
-    });
-
-
+    fetchData();
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 10000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
-
 
 
   const handleUpdate = async () => {
@@ -121,7 +141,7 @@ function MyComponent() {
       /> */}
 
       <h1>My Data</h1>
-      <button onClick={() => console.log(data)}>Console</button>
+      <button onClick={() => console.log(waterlevel)}>Console</button>
       <button onClick={() => handleUpdate()}>MOTOR off</button>
       <button onClick={() => handleUpdate2()}>MOTOR on</button>
 
@@ -137,10 +157,8 @@ function MyComponent() {
           return <h2>Currently Motor is Off !!</h2>;
         })}</div>
 
-      <div><label class="switch">
-        <input type="checkbox" checked />
-        <span class="slider"></span>
-      </label></div>
+<p>{waterlevel}</p>
+      
     </div>
   );
 }
